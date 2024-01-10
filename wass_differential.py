@@ -1,29 +1,42 @@
 #!/usr/bin/env python3
 
+import os
 import ot
 import ot.plot
+from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 
-BIN_COUNT = 1000
+IMG_FOLDER = './img'
+
+SAMPLES_PER_BIN = 100
 data = np.loadtxt("Langevin_1D.txt")
-DATA_COUNT = len(data)
-SAMPLES_PER_BIN = DATA_COUNT / BIN_COUNT
+data = data
+SAMPLE_COUNT = len(data)
+BIN_COUNT = int(SAMPLE_COUNT / SAMPLES_PER_BIN)
 bins = np.array_split(data, BIN_COUNT)
 
-dw = [ot.emd2_1d(bins[i], bins[i + 1]) for i in range(len(bins)-1)]
-mean_dw = np.mean(dw)
-std_dw = np.std(dw)
-filtered_dw = [x if np.abs(x - mean_dw) > 2*std_dw else 0 for x in dw]
+dw = [ot.emd2_1d(bins[i], bins[i + 1]) for i in range(BIN_COUNT-1)]
 
-fig, ax = plt.subplots()
-plt.figure(1, figsize=(100,5))
-ax.plot(np.arange(DATA_COUNT), data, 'r', alpha=0.7)
-# ax.scatter(SAMPLES_PER_BIN * np.arange(BIN_COUNT - 1), filtered_dw, c='b')
-for index, sample in enumerate(dw):
-    if np.abs(sample - mean_dw) > 2 * std_dw:
-        ax.vlines(SAMPLES_PER_BIN * index, -2, 2, linestyle='dashed')
 
-plt.savefig('dw.png')
+def make_graph(samples, q, filename):
+    plt.clf()
+    fig, ax = plt.subplots()
+    fig.set_size_inches(20, 5)
+    fig.set_size_inches(20, 5)
+    quantile = np.quantile(samples, q)
+    for index, sample in enumerate(samples):
+        if sample - quantile > 0:
+            ax.vlines(SAMPLES_PER_BIN * index, -2, 2, color='purple', linestyle='dashed')
 
-fig.clear()
+    ax.plot(np.arange(SAMPLE_COUNT), data, 'r', alpha=0.7)
+    plt.savefig(filename)
+
+
+for i in tqdm(range(50, 100, 5)):
+    path = os.path.join(IMG_FOLDER, f'quantile_{i}.png')
+    make_graph(dw, 0.01 * i, path)
+
+for i in tqdm(range(95, 100)):
+    path = os.path.join(IMG_FOLDER, f'quantile_{i}.png')
+    make_graph(dw, 0.01 * i, path)
