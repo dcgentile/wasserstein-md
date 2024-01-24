@@ -7,10 +7,10 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 
-IMG_FOLDER = '../img/'
+IMG_FOLDER = './img/'
 
 SAMPLES_PER_BIN = 100
-raw_data = np.loadtxt("../data/Langevin_1D.txt")
+raw_data = np.loadtxt("Langevin_1D.txt")
 data = [np.array([v]) for v in raw_data]
 SAMPLE_COUNT = len(data)
 BIN_COUNT = int(SAMPLE_COUNT / SAMPLES_PER_BIN)
