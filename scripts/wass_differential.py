@@ -22,7 +22,6 @@ def make_graph(samples, q, filename):
     plt.clf()
     fig, ax = plt.subplots()
     fig.set_size_inches(15, 5)
-    fig.set_size_inches(15, 5)
     quantile = np.quantile(samples, q)
     for index, sample in enumerate(samples):
         if sample - quantile > 0:
