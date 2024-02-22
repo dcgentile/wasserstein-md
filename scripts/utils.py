@@ -59,6 +59,6 @@ def kolmogorov_smirnov_change_points(data, windowsize, cutoff):
         for t in range(windowsize, len(data) - windowsize)
     ]
     for t in range(len(kolmogorov_statistics)):
-        if kolmogorov_statistics[t] > cutoff:
+        if kolmogorov_statistics[t].statistic > cutoff:
             change_points.append(t + windowsize)
     return change_points

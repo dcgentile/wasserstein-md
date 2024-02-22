@@ -36,6 +36,15 @@ class ChangePointDetector:
         return
 
     """
+    return a copy of the data as it is currently set
+    """
+
+    def get_data(self):
+        if self._data is None:
+            raise Exception("data has not been loade")
+        return self._data
+
+    """
     set the ground_truth property of the ChangePointDetector
     expects a string filename to represent the path to a
     CSV txt file
@@ -69,6 +78,31 @@ class ChangePointDetector:
             )
         else:
             raise Exception("passed method is not valid")
+        return
+
+    """
+    if data has already been provided, denoise it by taking local averages
+    over a prescribed windowsize
+    """
+
+    def denoise_data(self, windowsize):
+        if self._data is None:
+            raise Exception("no data has been set")
+        leading_batch = self._data[0:windowsize]
+        terminal_batch = self._data[(len(self._data) - windowsize) : len(self._data)]
+        if np.isnan(np.mean(terminal_batch)):
+            print(terminal_batch)
+            raise Exception("bad terminal_batch")
+        front_padding = [np.mean(leading_batch)] * windowsize
+        back_padding = [np.mean(terminal_batch)] * windowsize
+        denoised_data = []
+        for t in range(windowsize, len(self._data) - windowsize):
+            window = self._data[(t - windowsize) : (t + windowsize)]
+            denoised_data.append(np.mean(window))
+        print(len(front_padding))
+        print(len(back_padding))
+        print(len(denoised_data))
+        self._data = np.array(front_padding + denoised_data + back_padding)
         return
 
     """
