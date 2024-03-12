@@ -91,7 +91,6 @@ class ChangePointDetector:
         leading_batch = self._data[0:windowsize]
         terminal_batch = self._data[(len(self._data) - windowsize) : len(self._data)]
         if np.isnan(np.mean(terminal_batch)):
-            print(terminal_batch)
             raise Exception("bad terminal_batch")
         front_padding = [np.mean(leading_batch)] * windowsize
         back_padding = [np.mean(terminal_batch)] * windowsize
@@ -99,9 +98,6 @@ class ChangePointDetector:
         for t in range(windowsize, len(self._data) - windowsize):
             window = self._data[(t - windowsize) : (t + windowsize)]
             denoised_data.append(np.mean(window))
-        print(len(front_padding))
-        print(len(back_padding))
-        print(len(denoised_data))
         self._data = np.array(front_padding + denoised_data + back_padding)
         return
 
