@@ -14,6 +14,7 @@ class ChangePointDetector:
         self._data = None
         self._ground_truth = None
         self._predictions = None
+        self._difference_data = None
         self._f1 = None
         self._recall = None
         self._precision = None
@@ -26,13 +27,19 @@ class ChangePointDetector:
     resets the ground_truth and the predictions to None
     """
 
-    def set_data(self, filename):
-        try:
-            self._data = np.loadtxt(filename)
+    def set_data(self, filename=None, arr=None):
+        if filename is not None:
+            try:
+                self._data = np.loadtxt(filename, ndmin=2)
+                self._ground_truth = None
+                self._predictions = None
+            except:
+                print("could not load data, check file name and type")
+        else:
+            self._data = arr
             self._ground_truth = None
             self._predictions = None
-        except:
-            print("could not load data, check file name and type")
+            self._difference_data = None
         return
 
     """
@@ -41,8 +48,22 @@ class ChangePointDetector:
 
     def get_data(self):
         if self._data is None:
-            raise Exception("data has not been loade")
+            raise Exception("data has not been loaded")
         return self._data
+
+    """
+    return the change points, if they have been computed
+    """
+
+    def get_change_points(self):
+        if self._predictions is None:
+            raise Exception("change points have not been computed")
+        return self._predictions
+
+    def get_difference_data(self):
+        if self._difference_data is None:
+            raise Exception("change points have not been computed")
+        return self._difference_data
 
     """
     set the ground_truth property of the ChangePointDetector
@@ -69,7 +90,7 @@ class ChangePointDetector:
 
     def compute_change_points(self, method="wasserstein", windowsize=250, cutoff=0.85):
         if method == "wasserstein":
-            self._predictions = metric_wasserstein_change_points(
+            self._predictions, self._difference_data = metric_wasserstein_change_points(
                 self._data, windowsize=windowsize, quantile=cutoff
             )
         elif method == "kolmogorov":
