@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import ot
+from sklearn.cluster import KMeans
 
 """
 given a pandas dataframe with rows corresponding to
@@ -83,9 +84,25 @@ sampling from the slices of the data induced by the change points
 
 
 def create_sample_distributions(
-    data: pd.DataFrame, change_points: np.ndarray
+    data: pd.DataFrame, change_points: np.ndarray, start: int, end: int
 ) -> np.ndarray:
-    return np.array([0.0])
+    ECDF = []
+    for i in range(len(change_points)):
+        if i!=0 and i < len(change_points)-1:
+            prev_cp = change_points[i]
+            curr_cp = change_points[i+1]
+        elif i==0:
+            prev_cp = start
+            curr_cp = change_points[i+1]
+        else:
+            prev_cp = change_points[i]
+            curr_cp = end
+        # Construct empirical CDF over datapoints between two change points
+        orig_CDF = np.sort(data[prev_cp:curr_cp])
+        # Interpolate to obtain an expanded empirical CDF of 500 points
+        ecdf = np.interp(np.linspace(0, len(orig_CDF) - 1, 500), np.arange(len(orig_CDF)), orig_CDF)
+        ECDF.append(ecdf)
+    return np.array(ECDF)
 
 
 """
@@ -95,8 +112,10 @@ a dictionary containing the distributions and their labels
 """
 
 
-def cluster_sample_distributions(samples: np.ndarray) -> dict:
-    return {}
+def cluster_sample_distributions(samples: np.ndarray) -> np.ndarray:
+    Kmeans = KMeans(max_iter=1000)
+    Kmeans.fit(samples)
+    return Kmeans.labels_
 
 
 """
