@@ -36,7 +36,7 @@ return a list of candidate change points
 """
 
 
-def indentify_change_points(differences: np.ndarray, q=0.85) -> np.ndarray:
+def identify_change_points(differences: np.ndarray, q=0.85) -> np.ndarray:
     change_pts = []
     cutoff = np.quantile(differences, q)
     for index, dist in enumerate(differences):
@@ -88,19 +88,21 @@ def create_sample_distributions(
 ) -> np.ndarray:
     ECDF = []
     for i in range(len(change_points)):
-        if i!=0 and i < len(change_points)-1:
+        if i != 0 and i < len(change_points) - 1:
             prev_cp = change_points[i]
-            curr_cp = change_points[i+1]
-        elif i==0:
+            curr_cp = change_points[i + 1]
+        elif i == 0:
             prev_cp = start
-            curr_cp = change_points[i+1]
+            curr_cp = change_points[i + 1]
         else:
             prev_cp = change_points[i]
             curr_cp = end
         # Construct empirical CDF over datapoints between two change points
         orig_CDF = np.sort(data[prev_cp:curr_cp])
         # Interpolate to obtain an expanded empirical CDF of 500 points
-        ecdf = np.interp(np.linspace(0, len(orig_CDF) - 1, 500), np.arange(len(orig_CDF)), orig_CDF)
+        ecdf = np.interp(
+            np.linspace(0, len(orig_CDF) - 1, 500), np.arange(len(orig_CDF)), orig_CDF
+        )
         ECDF.append(ecdf)
     return np.array(ECDF)
 
