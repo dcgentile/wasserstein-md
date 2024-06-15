@@ -5,3 +5,7 @@
 /.DS_Store
 /archive/
 /src/__pycache__/
+/notebooks/.ipynb_checkpoints/8 Test Clustering CATBOSS-checkpoint.ipynb
+/notebooks/.ipynb_checkpoints/markov-checkpoint.ipynb
+/notebooks/.ipynb_checkpoints/plot_free_support_sinkhorn_barycenter-checkpoint.ipynb
+/notebooks/.ipynb_checkpoints/wasserstein-clustering-checkpoint.ipynb
