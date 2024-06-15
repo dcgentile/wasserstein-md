@@ -19,7 +19,7 @@ list of distances
 """
 
 
-def compute_wasserstein_distances(data: pd.DataFrame, w: int, reg=0.01) -> np.ndarray:
+def compute_wasserstein_distances(data: pd.DataFrame, w: int, reg=1) -> np.ndarray:
     n = len(data)
     distances = np.zeros((n))
     for t in tqdm(range(w, n - w)):
@@ -61,6 +61,12 @@ def filter_change_points(
         if change_points[i + 1] - change_points[i] > 1:
             boundary_pts.append(change_points[i])
             boundary_pts.append(change_points[i + 1])
+    # this is going to miss the last batch of change points, so lets do one more run
+    # but starting from the end
+    t = len(change_points) - 1
+    while change_points[t] - change_points[t - 1] == 1:
+        t -= 1
+    boundary_pts.append(t)
 
     # filter for and output the final change points
     filtered_points = []
